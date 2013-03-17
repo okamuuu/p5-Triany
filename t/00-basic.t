@@ -5,7 +5,10 @@ use lib 'lib';
 use Data::Dumper;
 use Test::More;
 
-BEGIN { use_ok 'Triany::Low' }
+BEGIN { 
+    use_ok 'Triany::Low';
+    use_ok 'Triany::Dictionary';
+}
    
 subtest 'setup_list' => sub {
 
@@ -37,6 +40,30 @@ subtest 'setup_list' => sub {
     }
 
     is_deeply(\@results, [31,41,59,26,53,58]);
+};
+
+subtest 'sample_dicti' => sub {
+
+    my $dictiTriany = Triany::Dictionary->new();
+    
+    warn 'hoge';
+
+    $dictiTriany->set_entry(123, 1);
+    $dictiTriany->set_entry(456, 2);
+    $dictiTriany->set_entry(789, 3);
+
+    warn 'hoge';
+
+    is($dictiTriany->find_entry(123), 1);
+    is($dictiTriany->find_entry(456), 2);
+    is($dictiTriany->find_entry(789), 3);
+    is($dictiTriany->find_entry(999), 0);
+
+    $dictiTriany->set_entry(456, 90);
+    is($dictiTriany->find_entry(456), 90);
+
+    $dictiTriany->set_entry(456, 6);
+    is($dictiTriany->find_entry(456), 6);
 };
 
 done_testing();

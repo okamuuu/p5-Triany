@@ -2,25 +2,23 @@ package Triany::Low;
 use strict;
 use warnings;
 
-my @Memory = ([],[0, 0, 0]);
-
 sub new {
     my ($class, %args) = @_;
  
     # id: $self->[0]
-    bless [1, [0, 0, 0]], $class;
+    bless [2, [0, 0, 0]], $class;
 }
+
+sub current_id { return $self->[0] }
 
 sub root_triany { return 1; }
 
 sub allocate_triany {
     my $self = shift;
 
-    my $new_id = ++$self->[0];
+    $self->[$self->[0]] = [0, 0, 0];
 
-    $self->[$new_id] = [0, 0, 0];
-
-    return $new_id;
+    return $self->[0]++;
 }
 
 sub _set { 
