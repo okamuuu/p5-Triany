@@ -9,29 +9,31 @@ BEGIN { use_ok 'Triany::Low' }
    
 subtest 'setup_list' => sub {
 
-    my $x = Triany::Low->root_triany();
-    my $y = Triany::Low->allocate_triany();
-    my $z = Triany::Low->allocate_triany();
+    my $lowTriany = Triany::Low->new();
 
-    Triany::Low->set_a($x, 31);
-    Triany::Low->set_b($x, 41);
-    Triany::Low->set_c($x, $y);
+    my $x = $lowTriany->root_triany();
+    my $y = $lowTriany->allocate_triany();
+    my $z = $lowTriany->allocate_triany();
 
-    Triany::Low->set_a($y, 59);
-    Triany::Low->set_b($y, 26);
-    Triany::Low->set_c($y, $z);
+    $lowTriany->set_a($x, 31);
+    $lowTriany->set_b($x, 41);
+    $lowTriany->set_c($x, $y);
 
-    Triany::Low->set_a($z, 53);
-    Triany::Low->set_b($z, 58);
-    Triany::Low->set_c($z,  0);
+    $lowTriany->set_a($y, 59);
+    $lowTriany->set_b($y, 26);
+    $lowTriany->set_c($y, $z);
+
+    $lowTriany->set_a($z, 53);
+    $lowTriany->set_b($z, 58);
+    $lowTriany->set_c($z,  0);
     
-    my $t = Triany::Low->root_triany();
+    my $t = $lowTriany->root_triany();
    
     my @results = ();
     while ( $t != 0 ) {
-        push @results, Triany::Low->get_a($t);
-        push @results, Triany::Low->get_b($t);
-        $t = Triany::Low->get_c($t);
+        push @results, $lowTriany->get_a($t);
+        push @results, $lowTriany->get_b($t);
+        $t = $lowTriany->get_c($t);
     }
 
     is_deeply(\@results, [31,41,59,26,53,58]);

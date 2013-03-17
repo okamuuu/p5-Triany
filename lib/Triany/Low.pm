@@ -4,62 +4,78 @@ use warnings;
 
 my @Memory = ([],[0, 0, 0]);
 
+sub new {
+    my ($class, %args) = @_;
+ 
+    # id: $self->[0]
+    bless [1, [0, 0, 0]], $class;
+}
+
 sub root_triany { return 1; }
 
 sub allocate_triany {
+    my $self = shift;
 
-    my $id = $#Memory + 1;
+    my $new_id = ++$self->[0];
 
-    $Memory[$id] = [0, 0, 0];
+    $self->[$new_id] = [0, 0, 0];
 
-    return $id;
+    return $new_id;
+}
+
+sub _set { 
+    my ($self, $id, $value, $index) = @_;
+
+    if ( $self->[$id] ) {
+        $self->[$id]->[$index] = $value;
+    }
 }
 
 sub set_a {
-    my ($class, $id, $value) = @_;
+    my ($self, $id, $value) = @_;
 
-    if ( $Memory[$id] ) {
-        $Memory[$id][0] = $value;
+    if ( $self->[$id] ) {
+        $self->[$id]->[0] = $value;
     }
 }
 
 sub set_b {
-    my ($class, $id, $value) = @_;
+    my ($self, $id, $value) = @_;
 
-    if ( $Memory[$id] ) {
-        $Memory[$id][1] = $value;
+    if ( $self->[$id] ) {
+        $self->[$id]->[1] = $value;
     }
 }
 
 sub set_c {
-    my ($class, $id, $value) = @_;
+    my ($self, $id, $value) = @_;
 
-    if ( $Memory[$id] ) {
-        $Memory[$id][2] = $value;
+    if ( $self->[$id] ) {
+        $self->[$id]->[2] = $value;
     }
 }
 
 sub get_a { 
-    my ($class, $id) = @_;
+    my ($self, $id) = @_;
 
-    if ( $Memory[$id] ) {
-        return $Memory[$id][0];
+    if ( $self->[$id] ) {
+        return $self->[$id]->[0];
     }
 }
 
 sub get_b { 
-    my ($class, $id) = @_;
+    my ($self, $id) = @_;
 
-    if ( $Memory[$id] ) {
-        return $Memory[$id][1];
+    if ( $self->[$id] ) {
+        return $self->[$id]->[1];
     }
 }
 
 sub get_c { 
-    my ($class, $id) = @_;
+    my ($self, $id) = @_;
 
-    if ( $Memory[$id] ) {
-        return $Memory[$id][2];
+    if ( $self->[$id] ) {
+        return $self->[$id]->[2];
     }
 }
 
