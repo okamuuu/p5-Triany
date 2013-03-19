@@ -9,8 +9,6 @@ sub new {
     bless [2, [0, 0, 0]], $class;
 }
 
-sub current_id { return $self->[0] }
-
 sub root_triany { return 1; }
 
 sub allocate_triany {
@@ -59,6 +57,8 @@ sub get_a {
     if ( $self->[$id] ) {
         return $self->[$id]->[0];
     }
+
+    return;
 }
 
 sub get_b { 
@@ -67,6 +67,8 @@ sub get_b {
     if ( $self->[$id] ) {
         return $self->[$id]->[1];
     }
+    
+    return;
 }
 
 sub get_c { 
@@ -75,6 +77,8 @@ sub get_c {
     if ( $self->[$id] ) {
         return $self->[$id]->[2];
     }
+    
+    return;
 }
 
 1;

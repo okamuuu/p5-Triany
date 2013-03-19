@@ -16,10 +16,12 @@ my $hash = {};
 while (<$FILE>) {
    
     if($_ =~ /^s\s(\d*)\s(\d*)/) {
+        if ($1 < 1) { die('omg!!'); }
         print 's ', $1, ' ',$2, "\n";
         $hash->{$1} = $2;
     }
     elsif($_ =~ /^f\s(\d*)/) {
+        if ($1 < 1) { die('omg!!'); }
         print 'f ', $1, "\n";
         my $result = $hash->{$1} || 0;
         $total += $result;

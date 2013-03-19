@@ -32,4 +32,5 @@ while (<$FILE>) {
 
 my $elapsed = Time::HiRes::tv_interval($start, [Time::HiRes::gettimeofday]);
 print 'total: ', $total, "\n";
-print 'elapsed: ', $elapsed;
+print 'elapsed: ', $elapsed, "\n";
+

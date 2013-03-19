@@ -46,13 +46,9 @@ subtest 'sample_dicti' => sub {
 
     my $dictiTriany = Triany::Dictionary->new();
     
-    warn 'hoge';
-
     $dictiTriany->set_entry(123, 1);
     $dictiTriany->set_entry(456, 2);
     $dictiTriany->set_entry(789, 3);
-
-    warn 'hoge';
 
     is($dictiTriany->find_entry(123), 1);
     is($dictiTriany->find_entry(456), 2);
