@@ -2,43 +2,30 @@ package Triany::Dictionary;
 use strict;
 use warnings;
 use parent 'Triany::Low';
-use constant TABLE_SIZE => 6000;
+use constant TABLE_SIZE => 100_000;
 
 sub _hash { return $_[0] % TABLE_SIZE + 1; }
+
+sub _found_bucket { return defined $_[0]->get_a($_[1]) ? 1 : 0 }
+
+sub _get_next_triany { return $_[0]->get_c($_[1]); }
 
 sub find_entry {
     my ($self, $key) = @_;
 
-    my $bucket = _hash($key);
+    my $triany = _hash($key);
 
-    ### bucket 自体が存在していない場合
-    if( not defined $self->get_a($bucket)) {
-        return 0; 
-    }
-
-    ### bucket の先頭で key が存在している場合
-    if ( $self->get_a($bucket) == $key ) {
-        return $self->get_b($bucket);
-    }
-       
-    ### bucket の先頭で終端
-    if ( $self->get_c($bucket) == 0 ) {
-        return 0;
-    }
-
-    ### bucket の先頭以降を走査
-    my $triany = $self->get_c($bucket);
+    ### 連結リストの終端まで走査
+    ### すでに終端の場合は走査しない
+    ### key が存在すれば value を返す
+    ### key が存在しない場合は 0 を返す
     while ( $triany != 0 ) {
         
-        #$triany = $self->get_c($bucket);
-
         if($self->get_a($triany) == $key) {
             return $self->get_b($triany);
         }
-        else {
-            $triany = $self->get_c($triany);
-        }
 
+        $triany = $self->_get_next_triany($triany);
     }
     
     return 0;
@@ -47,72 +34,70 @@ sub find_entry {
 sub set_entry {
     my ($self, $key, $value) = @_;
    
-    my $bucket = _hash($key);
+    my $triany = _hash($key);
 
-    ### bucket が存在していない場合は作成する
-    if ( not defined $self->get_a($bucket) ) {
-
-        my $triany;
-
-        while (not defined $self->get_a($bucket)) {
-            $triany = $self->allocate_triany();
-        }
-
-        $self->set_a($triany, $key);
-        $self->set_b($triany, $value);
-        $self->set_c($triany, 0);
-    
+    if ( not $self->_found_bucket($triany) ) {
+        $self->_create_bucket($triany, $key, $value);
         return;
     }
 
-    ### bucket の 先頭に key が存在する場合
-    if ( $self->get_a($bucket) == $key ) {
-        $self->set_b($bucket, $value);
-        return;
-    }
-   
-    ### bucket の先頭で終端の場合
-    if ( $self->get_c($bucket) == 0 ) {
+    ### 走査
+    my $next_triany;
+    while (1) {
         
-        my $new_triany = $self->allocate_triany();
+        return if $self->_find_and_update($triany, $key, $value);
 
-        $self->set_c($bucket, $new_triany);
+        $next_triany = $self->_get_next_triany($triany);
 
-        $self->set_a($new_triany, $key);
-        $self->set_b($new_triany, $value);
-        $self->set_c($new_triany, 0);
+        last if not $next_triany;
 
-        return;
-    }
-
-    ### bucket の次のリンク以降を走査
-    my $triany = $self->get_c($bucket);
-    my $_triany = $self->root_triany();
-    
-    while ( $triany != 0 ) {
-
-        if($self->get_a($triany) == $key) {
-
-            $self->set_b($triany, $value);
-            return;
-        }
-        else {
-            $_triany = $triany;
-            $triany = $self->get_c($triany);
-        }
-
+        $triany = $next_triany;
     }
     
     ### 走査しても見つからずリストの終端になったケース 
+    $self->_add_chain($triany, $key, $value);
+
+    return;
+}
+
+sub _add_chain {
+    my ($self, $pre_triany, $key, $value) = @_;
+
     my $new_triany = $self->allocate_triany();
 
-    $self->set_c($_triany, $new_triany);
+    $self->set_c($pre_triany, $new_triany);
 
     $self->set_a($new_triany, $key);
     $self->set_b($new_triany, $value);
     $self->set_c($new_triany, 0);
 
     return;
+}
+
+sub _create_bucket {
+    my ($self, $triany, $key, $value) = @_;
+        
+    my $_triany;
+    
+    while (not defined $self->get_a($triany)) {
+        $_triany = $self->allocate_triany();
+    }
+
+    $self->_add_chain($_triany, $key, $value);
+
+    return $_triany;
+}
+
+sub _find_and_update {
+    my ($self, $triany, $key, $value) = @_;
+
+    if($self->get_a($triany) == $key) {
+
+        $self->set_b($triany, $value);
+        return 1;
+    }
+    
+    return; 
 }
 
 1;
