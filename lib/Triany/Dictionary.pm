@@ -21,11 +21,11 @@ sub find_entry {
     ### key が存在しない場合は 0 を返す
     while ( $triany != 0 ) {
         
-        if($self->get_a($triany) == $key) {
+        if($self->get_a($triany) and $self->get_a($triany) == $key) {
             return $self->get_b($triany);
         }
 
-        $triany = $self->_get_next_triany($triany);
+        $triany = $self->_get_next_triany($triany) || 0;
     }
     
     return 0;
